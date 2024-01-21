@@ -1,6 +1,6 @@
 /**
  * Name: MeteoMatics 
- * Version: 1.0
+ * Version: 1.1.1
  * Author: Maxime Boissonneault
  * 
  * Description: Polls weather information from MeteoMatics
@@ -121,6 +121,7 @@ metadata {
    capability "Pressure Measurement"
 
    attribute "uv", "number"
+   attribute "weather", "string"
    attribute "weather_1h", "string"
    attribute "weather_1h_idx", "number"
    attribute "weather_24h", "string"
@@ -130,7 +131,9 @@ metadata {
    attribute "temp_min_24h", "decimal"
    attribute "pressure", "decimal"
    attribute "wind_speed", "decimal"
+   attribute "windSpeed", "decimal"
    attribute "wind_direction", "decimal"
+   attribute "windDirection", "decimal"
    attribute "wind_gusts_1h", "decimal"
    attribute "wind_gusts_24h", "decimal"
    attribute "precipitations_1h", "decimal"
@@ -278,6 +281,7 @@ def processParameterUpdate(key, val) {
 //    log.debug "Processing ${key}: ${val}"
     switch(key) {
         case "weather_symbol_1h":
+            sendEvent(name: "weather", value: getWeatherText(val))
             sendEvent(name: "weather_1h", value: getWeatherText(val))
             sendEvent(name: "weather_1h_idx", value: val)
             break;
@@ -301,6 +305,7 @@ def processParameterUpdate(key, val) {
             sendEvent(name: "pressure", value: val, unit:"${getUnit(key)}")
             break;
         case "wind_speed_10m":
+            sendEvent(name: "windSpeed", value: val, unit:"${getUnit(key)}")
             sendEvent(name: "wind_speed", value: val, unit:"${getUnit(key)}")
             break;
         case "wind_gusts_10m_1h":
@@ -337,6 +342,7 @@ def processParameterUpdate(key, val) {
             sendEvent(name: "sunset", value: val)
             break;
         case "wind_dir_10m":
+            sendEvent(name: "windDirection", value: val)
             sendEvent(name: "wind_direction", value: val)
             break;
     }

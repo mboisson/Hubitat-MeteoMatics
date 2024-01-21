@@ -1,0 +1,16 @@
+{
+  "packageName": "MeteoMatics",
+  "author": "Maxime Boissonneault",
+  "version": "1.0",
+  "minimumHEVersion": "2.3.0",
+  "dateReleased": "2024-01-20",
+  "drivers": [
+    {
+      "id": "91efadc2-1a96-48ef-a6cf-eec33e610bb0",
+      "name": "MeteoMatics",
+      "namespace": "mboisson",
+      "location": "https://raw.githubusercontent.com/mboisson/Hubitat-MeteoMatics/main/MeteoMatics.groovy",
+      "required": true
+    }
+  ]
+}

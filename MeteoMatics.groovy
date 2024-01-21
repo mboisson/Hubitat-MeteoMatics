@@ -79,16 +79,18 @@ import java.text.SimpleDateFormat
     "wind_speed_10m",
     "wind_dir_10m",
     "wind_gusts_10m_1h",
-    "wind_gusts_10m_24h",
     "t_2m",
-    "t_max_2m_24h",
-    "t_min_2m_24h",
     "msl_pressure",
     "precip_1h",
-    "precip_24h",
     "weather_symbol_1h",
-    "weather_symbol_24h",
     "uv",
+]
+@Field static final List AttributesToQuery_24h = [
+    "wind_gusts_10m_24h",
+    "t_max_2m_24h",
+    "t_min_2m_24h",
+    "precip_24h",
+    "weather_symbol_24h",
     "sunrise",
     "sunset"
 ]
@@ -98,7 +100,7 @@ preferences {
     input name: "password", type: "text",   title: "Password", required: true
     input name: "lat", type: "text",   title: "Latitude", required: true, description:"-90..90"
     input name: "lon", type: "text",   title: "Longitude", required: true, description:"-180..180"
-    input name: "pollTime", type: "enum", title: "Poll frequency", required: true, multiple: false, defaultValue: RefreshIntervalOpts.defaultValue, options: RefreshIntervalOpts.options
+    input name: "pollTime", type: "enum", title: "Poll frequency for live data", required: true, multiple: false, defaultValue: RefreshIntervalOpts.defaultValue, options: RefreshIntervalOpts.options
     input name: "temperatureUnit", type: "enum", title: "Temperature Unit", required: true, multiple: false, defaultValue: TemperatureUnitOpts.defaultValue, options: TemperatureUnitOpts.options
     input name: "windSpeedUnit", type: "enum", title: "Wind Speed Unit", required: true, multiple: false, defaultValue: WindSpeedUnitOpts.defaultValue, options: WindSpeedUnitOpts.options
     input name: "pressureUnit", type: "enum", title: "Pressure Unit", required: true, multiple: false, defaultValue: PressureUnitOpts.defaultValue, options: PressureUnitOpts.options
@@ -156,6 +158,31 @@ def queryAPI() {
     
     parameters = ""
     AttributesToQuery.eachWithIndex { item, index ->
+        parameter = "${item}:${getUnit(item)}"
+        parameters = "${parameter},${parameters}"
+        if (index % max_items == max_items-1) {
+            // remove last comma
+            parameters = parameters.replaceFirst(".\$","")
+            queryAPI(date, parameters, loc)
+            parameters = ""
+        }
+    }
+    if (parameters != "") {
+        // remove last comma
+        parameters = parameters.replaceFirst(".\$","")
+        queryAPI(date, parameters, loc)
+    }
+}
+def queryAPI24h() {
+    loc = "${settings.lat},${settings.lon}"
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")    
+    dateString = sdf.format(now())
+//    log.debug "now:${dateString}"
+    date = "${dateString}P0D:PT24H"
+    max_items = 10
+    
+    parameters = ""
+    AttributesToQuery_24h.eachWithIndex { item, index ->
         parameter = "${item}:${getUnit(item)}"
         parameters = "${parameter},${parameters}"
         if (index % max_items == max_items-1) {
@@ -326,6 +353,7 @@ def initialize(){
 def scheduleQuery() {
     log.debug "settings.pollTime:${settings.pollTime}"
     unschedule(queryAPI)
+    unschedule(queryAPI24h)
     pollTime = settings.pollTime as Integer
     pollMinutes = pollTime % 60
     pollHours = pollTime / 60 as Integer
@@ -339,6 +367,8 @@ def scheduleQuery() {
         log.info "Scheduling queryAPI every ${pollHours} hours"
         schedule("0 0 */${pollHours} ? * *", queryAPI)
     }
+    log.info "Scheduling queryAPI24 every 24 hours"
+    schedule("0 0 2 ? * *", queryAPI24h)
 }
 
 def getUnit(attr) {

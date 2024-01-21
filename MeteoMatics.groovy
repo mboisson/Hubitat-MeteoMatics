@@ -102,7 +102,6 @@ preferences {
     input name: "temperatureUnit", type: "enum", title: "Temperature Unit", required: true, multiple: false, defaultValue: TemperatureUnitOpts.defaultValue, options: TemperatureUnitOpts.options
     input name: "windSpeedUnit", type: "enum", title: "Wind Speed Unit", required: true, multiple: false, defaultValue: WindSpeedUnitOpts.defaultValue, options: WindSpeedUnitOpts.options
     input name: "pressureUnit", type: "enum", title: "Pressure Unit", required: true, multiple: false, defaultValue: PressureUnitOpts.defaultValue, options: PressureUnitOpts.options
-//    input name: "attributesToQuery", type: "enum", title: "Attributes to query", required: true, multiple: true, defaultValue: AttributesToQuery, options: AttributesToQuery
     input name: "logEnable", type: "bool",   title: "Enable debug logging", defaultValue: false, required: true
 }
 
@@ -112,12 +111,11 @@ metadata {
    name: "MeteoMatics",
    namespace: "mboisson",
    author: "Maxime Boissonneault",
-   importUrl: "https://TODO") {
+   importUrl: "https://raw.githubusercontent.com/mboisson/Hubitat-MeteoMatics/main/MeteoMatics.groovy") {
         
    capability "Refresh"
    capability "Initialize"
    capability "Temperature Measurement"
-//   capability "RelativeHumidityMeasurement"
    capability "Pressure Measurement"
 
    attribute "uv", "number"
